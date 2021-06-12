@@ -36,7 +36,8 @@ router.get('/topics', (req, res, next) => {
 });
 
 router.get('/:quizId', ({ quiz }, res, next) => {
-	helpers.getQuiz(quiz.id).then((response) => res.status(200).json(response).catch(next));
+	// console.log('quiz req', quiz);
+	res.status(200).json(quiz);
 });
 
 router.get('/:quizId/scores', ({ quiz }, res, next) => {

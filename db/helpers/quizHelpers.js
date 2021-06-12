@@ -116,17 +116,17 @@ module.exports = {
 			}
 		}
 		let author = await db('users').where('id', quiz.author).select('id', 'username', 'img_url').first();
-		let questions = await db('questions')
-			// .select(db.raw('count(quiz_id)::integer'))
-			// .select()
-			.groupBy('quiz_id')
-			.where({ quiz_id })
-			.first();
-		if (questions) {
-			quiz.question_count = questions.count;
-		} else {
-			quiz.question_count = 0;
-		}
+		// let questions = await db('questions')
+		// 	.select(db.raw('count(quiz_id)::integer'))
+		// 	.select()
+		// 	.groupBy('quiz_id')
+		// 	.where({ quiz_id })
+		// 	.first();
+		// if (questions) {
+		// 	quiz.question_count = questions.count;
+		// } else {
+		// 	quiz.question_count = 0;
+		// }
 		quiz.author = author;
 		return quiz;
 	},
