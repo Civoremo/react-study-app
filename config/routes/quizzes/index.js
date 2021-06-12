@@ -3,6 +3,7 @@ const router = express.Router();
 const questionRouter = require('./questionRoutes');
 const { invalidQuiz, invalidUserQuizUpdate } = require('../../schema');
 const helpers = require('../../../db/helpers/quizHelpers');
+const { response } = require('express');
 
 router.param('quizId', (req, res, next, id) => {
 	helpers
@@ -35,7 +36,7 @@ router.get('/topics', (req, res, next) => {
 });
 
 router.get('/:quizId', ({ quiz }, res, next) => {
-	res.status(200).json(quiz);
+	helpers.getQuiz(quiz.id).then((response) => res.status(200).json(response).catch(next));
 });
 
 router.get('/:quizId/scores', ({ quiz }, res, next) => {
