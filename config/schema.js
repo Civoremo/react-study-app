@@ -4,12 +4,12 @@ const registerUserSchema = {
 	username: Joi.string().alphanum().min(4).max(10).required(),
 	password: Joi.string().required(),
 	email: Joi.string().required(),
-	img_url: Joi.string().allow('', null),
+	img_url: Joi.string().allow('', null)
 };
 
 const loginUserSchema = {
 	email: Joi.string().required(),
-	password: Joi.string().required(),
+	password: Joi.string().required()
 };
 
 const quizSchema = {
@@ -18,7 +18,7 @@ const quizSchema = {
 	topic: Joi.string().max(20).required(),
 	description: Joi.string().allow('', null),
 	votes: Joi.number().integer(),
-	question_time_limit: Joi.number().integer().max(60).allow('', null),
+	question_time_limit: Joi.number().integer().max(60).allow('', null)
 };
 
 const updateQuizSchema = Joi.object()
@@ -27,7 +27,7 @@ const updateQuizSchema = Joi.object()
 		time_limit_seconds: Joi.number().integer(),
 		topic: Joi.string().max(20),
 		description: Joi.string(),
-		question_time_limit: Joi.number().integer().max(60).allow('', null),
+		question_time_limit: Joi.number().integer().max(60).allow('', null)
 	})
 	.or('title', 'time_limit_seconds', 'topic', 'description', 'question_time_limit');
 
@@ -35,14 +35,14 @@ const UserQuizSchema = Joi.object()
 	.keys({
 		vote: Joi.number().integer().min(-1).max(1),
 		favorite: Joi.boolean(),
-		score: Joi.number().integer(),
+		score: Joi.number().integer()
 	})
 	.or('vote', 'favorite', 'score');
 
 const UserPostSchema = Joi.object()
 	.keys({
 		vote: Joi.number().integer().min(-1).max(1),
-		favorite: Joi.boolean(),
+		favorite: Joi.boolean()
 	})
 	.or('vote', 'favorite');
 
@@ -52,7 +52,7 @@ const questionSchema = {
 	option2: Joi.string().required(),
 	option3: Joi.string().allow('', null),
 	option4: Joi.string().allow('', null),
-	answer: Joi.number().integer().required().min(1).max(4),
+	answer: Joi.number().integer().required().min(1).max(4)
 };
 
 const updateQuestionSchema = Joi.object()
@@ -62,7 +62,7 @@ const updateQuestionSchema = Joi.object()
 		option2: Joi.string(),
 		option3: Joi.string().allow('', null),
 		option4: Joi.string().allow('', null),
-		answer: Joi.number().integer().min(1).max(4),
+		answer: Joi.number().integer().min(1).max(4)
 	})
 	.or('question', 'option1', 'option2', 'option3', 'option4', 'answer');
 
@@ -70,18 +70,19 @@ const postSchema = {
 	title: Joi.string().required(),
 	body: Joi.string().required(),
 	topic: Joi.string().max(20).allow('', null),
-	quiz: Joi.number().integer(),
+	quiz: Joi.number().integer()
 };
 
 const updatePostSchema = Joi.object()
 	.keys({
 		title: Joi.string(),
-		body: Joi.string(),
+		body: Joi.string()
 	})
 	.or('title', 'body');
 
 module.exports = {
 	registerSchema(user) {
+		console.log('registerSchema', Joi.validate(user, registerUserSchema, { stripUnknown: true }));
 		return Joi.validate(user, registerUserSchema, { stripUnknown: true });
 	},
 	invalidLogin(user) {
@@ -119,5 +120,5 @@ module.exports = {
 	invalidUserPostUpdate(input) {
 		const { error } = Joi.validate(input, UserPostSchema, { stripUnknown: true });
 		return error;
-	},
+	}
 };

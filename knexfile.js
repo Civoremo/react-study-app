@@ -5,20 +5,20 @@ pg.defaults.ssl = false;
 
 module.exports = {
 	development: {
-		client: 'pg',
+		client: 'sqlite3',
 		connection: {
-			filename: './db/db.sqlite3'
+			filename: './db/fresh.sqlite3'
 		},
-		pool: {
-			afterCreate: function(conn, cb) {
-				conn.run('PRAGMA foreign_keys = ON', cb);
-			}
-		},
+		// pool: {
+		// 	afterCreate: function(conn, cb) {
+		// 		conn.run('PRAGMA foreign_keys = ON', cb);
+		// 	}
+		// },
 
 		useNullAsDefault: true,
 		migrations: {
-			directory: './db/migrations',
-			tableName: 'dbmigrations'
+			directory: './db/migrations'
+			// tableName: 'dbmigrations'
 		}
 		// seeds: { directory: './db/seeds' }
 	},
@@ -49,7 +49,7 @@ module.exports = {
 		migrations: {
 			// tableName: 'knex_migrations'
 			directory: './db/migrations'
-		},
-		seeds: { directory: './db/seeds' }
+		}
+		// seeds: { directory: './db/seeds' }
 	}
 };

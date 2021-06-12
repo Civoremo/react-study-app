@@ -14,11 +14,15 @@ module.exports = {
 			.whereRaw('quiz_id = q.id')
 			.as('post_count');
 
+		// console.log('posts', posts);
+
 		let questions = db
-			.select(db.raw('count(quiz_id)::integer'))
+			.select(db.raw('count(quiz_id):integer'))
 			.from('questions')
 			.whereRaw('quiz_id = q.id')
 			.as('question_count');
+
+		// console.log('Qs', questions);
 
 		if (user.id) {
 			let vote = db
@@ -54,12 +58,12 @@ module.exports = {
 					'q.question_time_limit',
 					'u.username as author',
 					'u.img_url as author_img',
-					't.name as topic',
-					questions,
-					posts,
-					vote,
-					score,
-					favorite,
+					't.name as topic'
+					// questions
+					// posts,
+					// vote,
+					// score,
+					// favorite,
 				);
 		} else {
 			return db('quizzes as q')
@@ -74,9 +78,9 @@ module.exports = {
 					'q.question_time_limit',
 					'u.username as author',
 					'u.img_url as author_img',
-					't.name as topic',
-					questions,
-					posts,
+					't.name as topic'
+					// questions
+					// posts,
 				);
 		}
 	},
@@ -93,7 +97,7 @@ module.exports = {
 				'q.time_limit_seconds',
 				'q.question_time_limit',
 				'q.author',
-				't.name as topic',
+				't.name as topic'
 			)
 			.first();
 
@@ -105,18 +109,16 @@ module.exports = {
 					...quiz,
 					user_vote: user_quiz.vote,
 					favorite: user_quiz.favorite ? true : false,
-					score: user_quiz.score,
+					score: user_quiz.score
 				};
 			} else {
 				quiz = { ...quiz, user_vote: 0, favorite: false, score: 0 };
 			}
 		}
-		let author = await db('users')
-			.where('id', quiz.author)
-			.select('id', 'username', 'img_url')
-			.first();
+		let author = await db('users').where('id', quiz.author).select('id', 'username', 'img_url').first();
 		let questions = await db('questions')
-			.select(db.raw('count(quiz_id)::integer'))
+			// .select(db.raw('count(quiz_id)::integer'))
+			// .select()
 			.groupBy('quiz_id')
 			.where({ quiz_id })
 			.first();
@@ -132,10 +134,7 @@ module.exports = {
 		return db('topics');
 	},
 	async getTopicId(name) {
-		let topic = await db('topics')
-			.where(db.raw('LOWER("name") = ?', name.toLowerCase()))
-			.select('id')
-			.first();
+		let topic = await db('topics').where(db.raw('LOWER("name") = ?', name.toLowerCase())).select('id').first();
 		if (!topic) {
 			let [ id ] = await db('topics').returning('id').insert({ name });
 			return id;
@@ -184,9 +183,9 @@ module.exports = {
 					'p.created_at',
 					'u.username as author',
 					'u.img_url as author_img',
-					comments,
+					// comments,
 					vote,
-					favorite,
+					favorite
 				);
 		}
 
@@ -203,30 +202,21 @@ module.exports = {
 				't.name as topic',
 				'p.created_at',
 				'u.username as author',
-				'u.img_url as author_img',
-				comments,
+				'u.img_url as author_img'
+				// comments
 			);
 	},
-	async createQuiz({
-		title,
-		author,
-		time_limit_seconds,
-		topic,
-		description,
-		question_time_limit,
-	}) {
+	async createQuiz({ title, author, time_limit_seconds, topic, description, question_time_limit }) {
 		let topic_id = await this.getTopicId(topic);
 
-		return db('quizzes')
-			.returning('id')
-			.insert({
-				title,
-				author,
-				time_limit_seconds,
-				topic_id,
-				description,
-				question_time_limit,
-			});
+		return db('quizzes').returning('id').insert({
+			title,
+			author,
+			time_limit_seconds,
+			topic_id,
+			description,
+			question_time_limit
+		});
 	},
 	async updateQuiz(
 		{
@@ -234,9 +224,9 @@ module.exports = {
 			title = undefined,
 			time_limit_seconds = undefined,
 			question_time_limit = undefined,
-			description = undefined,
+			description = undefined
 		},
-		id,
+		id
 	) {
 		let topic_id = undefined;
 		if (topic) {
@@ -250,11 +240,7 @@ module.exports = {
 	deleteQuiz(id) {
 		return db('quizzes').where({ id }).del();
 	},
-	async userQuizUpdate(
-		{ vote = undefined, score = null, favorite = undefined },
-		user_id,
-		quiz_id,
-	) {
+	async userQuizUpdate({ vote = undefined, score = null, favorite = undefined }, user_id, quiz_id) {
 		let entry = await db('users_quizzes').where({ user_id }).andWhere({ quiz_id }).first();
 
 		if (!entry) {
@@ -273,14 +259,10 @@ module.exports = {
 		if (vote !== undefined && vote !== entry.vote) {
 			let difference = Math.abs(vote - entry.vote);
 
-			if (vote < entry.vote)
-				await db('quizzes').where('id', quiz_id).decrement('votes', difference);
+			if (vote < entry.vote) await db('quizzes').where('id', quiz_id).decrement('votes', difference);
 			else await db('quizzes').where('id', quiz_id).increment('votes', difference);
 		}
 
-		return db('users_quizzes')
-			.returning('id')
-			.where({ quiz_id, user_id })
-			.update({ vote, score, favorite });
-	},
+		return db('users_quizzes').returning('id').where({ quiz_id, user_id }).update({ vote, score, favorite });
+	}
 };

@@ -7,7 +7,7 @@ const helpers = require('../../../db/helpers/quizHelpers');
 router.param('quizId', (req, res, next, id) => {
 	helpers
 		.getQuiz(id, req.user)
-		.then(quiz => {
+		.then((quiz) => {
 			if (!quiz) return next({ code: 404 });
 			if (quiz.author.id === req.user.id) req.user.authorized = true;
 			req.quiz = quiz;
@@ -19,7 +19,7 @@ router.param('quizId', (req, res, next, id) => {
 router.get('/', ({ query, user }, res, next) => {
 	helpers
 		.getQuizzes(query.topic, user)
-		.then(response => {
+		.then((response) => {
 			res.status(200).json(response);
 		})
 		.catch(next);
@@ -28,7 +28,7 @@ router.get('/', ({ query, user }, res, next) => {
 router.get('/topics', (req, res, next) => {
 	helpers
 		.getTopics()
-		.then(response => {
+		.then((response) => {
 			res.status(200).json(response);
 		})
 		.catch(next);
@@ -39,14 +39,11 @@ router.get('/:quizId', ({ quiz }, res, next) => {
 });
 
 router.get('/:quizId/scores', ({ quiz }, res, next) => {
-	helpers.getQuizScores(quiz.id).then(response => res.status(200).json(response)).catch(next);
+	helpers.getQuizScores(quiz.id).then((response) => res.status(200).json(response)).catch(next);
 });
 
 router.get('/:quizId/posts', ({ quiz, user }, res, next) => {
-	helpers
-		.getQuizPosts(quiz.id, user.id)
-		.then(response => res.status(200).json(response))
-		.catch(next);
+	helpers.getQuizPosts(quiz.id, user.id).then((response) => res.status(200).json(response)).catch(next);
 });
 
 router.patch('/:quizId/edit', ({ quiz, body, user }, res, next) => {
@@ -54,7 +51,7 @@ router.patch('/:quizId/edit', ({ quiz, body, user }, res, next) => {
 	if (invalidQuiz(body, true)) return next({ code: 400 });
 	helpers
 		.updateQuiz(body, quiz.id)
-		.then(response => {
+		.then((response) => {
 			if (!response) return next({ code: 404 });
 			res.status(200).json(response);
 		})
@@ -66,7 +63,7 @@ router.patch('/:quizId', ({ quiz, body, user }, res, next) => {
 	if (invalidUserQuizUpdate(body)) return next({ code: 400 });
 	helpers
 		.userQuizUpdate(body, user.id, quiz.id)
-		.then(response => {
+		.then((response) => {
 			if (!response) return next({ code: 400 });
 			res.status(200).json(response);
 		})
@@ -79,7 +76,7 @@ router.post('/', ({ body, user }, res, next) => {
 	body.author = user.id;
 	helpers
 		.createQuiz(body)
-		.then(response => {
+		.then((response) => {
 			if (!response) return next({ code: 404 });
 			res.status(200).json(response);
 		})
@@ -88,7 +85,7 @@ router.post('/', ({ body, user }, res, next) => {
 
 router.delete('/:quizId', ({ quiz, body, user }, res, next) => {
 	if (!user.authorized) return next({ code: 401 });
-	helpers.deleteQuiz(quiz.id).then(response => {
+	helpers.deleteQuiz(quiz.id).then((response) => {
 		if (!response) return next({ code: 404 });
 		res.status(200).json({ message: 'Quiz successfully deleted.' });
 	});
