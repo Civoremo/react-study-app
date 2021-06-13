@@ -10,11 +10,13 @@ const router = express.Router();
 
 function generateToken(payload) {
 	return jwt.sign(payload, 'secret', {
-		expiresIn: '1y',
+		expiresIn: '1y'
 	});
 }
 
 router.post('/register', (req, res, next) => {
+	console.log('registering user');
+	console.log('payload', req.body);
 	let register = registerSchema(req.body);
 	if (register.error) return next({ code: 400 });
 	let body = register.value;
@@ -26,7 +28,10 @@ router.post('/register', (req, res, next) => {
 			let token = generateToken({ id });
 			return res.status(200).json({ token, user: { id, username: body.username } });
 		})
-		.catch(next);
+		.catch((err) => {
+			console.log('register error', err);
+			return next;
+		});
 });
 
 router.post('/login', ({ body }, res, next) => {
@@ -35,7 +40,7 @@ router.post('/login', ({ body }, res, next) => {
 	db('users')
 		.where({ email: body.email })
 		.first()
-		.then(response => {
+		.then((response) => {
 			if (!response) return next({ code: 404 });
 			if (!bcrypt.compareSync(body.password, response.password)) return next({ code: 400 });
 
@@ -45,8 +50,8 @@ router.post('/login', ({ body }, res, next) => {
 				user: {
 					id: response.id,
 					username: response.username,
-					img_url: response.img_url,
-				},
+					img_url: response.img_url
+				}
 			});
 		})
 		.catch(next);
@@ -71,9 +76,7 @@ router.patch('/update', async ({ body, user }, res, next) => {
 				let token = generateToken({ id });
 				return res.status(200).json({ token, user: { id } });
 			} else {
-				return res
-					.status(200)
-					.json({ user: { id, username: body.newUsername, img_url: body.newImg } });
+				return res.status(200).json({ user: { id, username: body.newUsername, img_url: body.newImg } });
 			}
 		})
 		.catch(next);
